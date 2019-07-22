@@ -1,5 +1,6 @@
 import React from 'react'
 import { Form } from 'semantic-ui-react'
+const URL = 'http://localhost:3000/pokemon'
 
 class PokemonForm extends React.Component {
   constructor() {
@@ -11,6 +12,46 @@ class PokemonForm extends React.Component {
       frontUrl: '',
       backUrl: ''
     }
+  }
+
+  postPoke = () => {
+    return fetch(URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json"
+      },
+      body: JSON.stringify({
+        name: this.state.name,
+        stats: [
+          {
+            value: this.state.hp,
+            name: "hp"
+          }
+        ],
+        sprites: {
+          front: this.state.frontUrl,
+          back: this.state.backUrl
+        }
+      })
+    })
+    .then(r => r.json())
+  }
+
+  handleSubmit = (event) => {
+    event.preventDefault()
+
+    this.setState({
+      name: event.target.name.value,
+      hp: event.target.hp.value,
+      frontUrl: event.target.frontUrl.value,
+      backUrl: event.target.backUrl.value
+    }, () => {
+      this.postPoke()
+      .then(newPokemon => this.props.updatePokemon(newPokemon))
+    })
+
+
   }
 
   render() {
